@@ -1,137 +1,409 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/main"
-    android:orientation="vertical"
-    android:padding="16dp"
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <ImageView
-        android:id="@+id/ivDetailImage"
-        android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:scaleType="centerCrop" />
-
-    <TextView
-        android:id="@+id/tvDetailTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp"
-        android:text="hello"/>
-
-    <TextView
-        android:id="@+id/tvAuthor"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp"/>
-
-    <TextView
-        android:id="@+id/tvDescription"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:text="heklo"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Book Status"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp"/>
-
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:backgroundTint="@color/lightWhite"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <LinearLayout
-        android:id="@+id/llStatusButtons"
+        android:id="@+id/main"
+        android:orientation="vertical"
+        android:paddingVertical="1dp"
+        android:paddingHorizontal="16dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp"
-        android:weightSum="3">
-
-        <Button
-            android:id="@+id/btnWantToRead"
-            android:layout_width="0dp"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="20dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="10dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/ic_back"/>
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivDetailImage"
+            android:layout_width="260dp"
+            android:layout_height="340dp"
+            android:scaleType="centerCrop"
+            android:layout_gravity="center"
+            android:src="@android:drawable/ic_menu_gallery"
+            app:shapeAppearanceOverlay="@style/singleBookImage" />
+        <TextView
+            android:id="@+id/tvDetailTitle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Want to Read"/>
-
-        <Button
-            android:id="@+id/btnCurrentlyReading"
-            android:layout_width="0dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="Book Title"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textSize="35sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/jakarta_extra_bold"
+            android:textColor="@color/darkerGray"
+            android:layout_marginTop="16dp" />
+        <TextView
+            android:id="@+id/tvAuthor"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Currently Reading"/>
-
-        <Button
-            android:id="@+id/btnCompleted"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Completed"/>
-    </LinearLayout>
-    <!--    spiinner like button with Want to Read, Currently Reading, Read-->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:text="Add to Lists"/>
-    <LinearLayout
-        android:id="@+id/llAddToCommunity"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="16dp">
-
-        <EditText
-            android:id="@+id/etListTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:hint="List title"
-            android:layout_weight="1"/>
-
-        <Button
-            android:id="@+id/btnAddToCommunity"
+            android:text="Author"
+            android:textSize="25sp"
+            android:textStyle="italic"
+            android:gravity="center"
+            android:textColor="@color/navyBlue"
+            android:fontFamily="@font/jakarta_bold_italic"
+            android:layout_marginTop="16dp"/>
+        <TextView
+            android:id="@+id/tvCategory"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add"/>
+            android:textSize="14sp"
+            android:layout_gravity="center"
+            android:text="GENRE"
+            android:fontFamily="@font/jakarta_medium"
+            android:textColor="@color/black"
+            android:backgroundTint="@color/lightBlue"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="4dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/rounded_reactions_container"
+            android:layout_marginTop="16dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp"
+            android:paddingVertical="6dp"
+            android:paddingHorizontal="4dp"
+            android:backgroundTint="#80F0F0F8"
+            android:background="@drawable/rounded_btn_container">
+            <Button
+                android:id="@+id/btnWantToRead"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Want to Read"
+                android:textColor="@color/black"
+                android:fontFamily="@font/jakarta_bold"
+                android:backgroundTint="#80F0F0F8"
+                android:layout_marginRight="4dp"/>
+            <Button
+                android:id="@+id/btnCurrentlyReading"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Currently Reading"
+                android:textColor="@color/black"
+                android:fontFamily="@font/jakarta_bold"
+                android:backgroundTint="#80F0F0F8"
+                android:layout_marginRight="4dp"/>
+            <Button
+                android:id="@+id/btnCompleted"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Read"
+                android:fontFamily="@font/jakarta_bold"
+                android:textColor="@color/black"
+                android:backgroundTint="#80F0F0F8"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llStatusButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:weightSum="3">
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnPreview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/lightBrown"
+            android:text="Preview"
+            android:textSize="18sp"
+            android:fontFamily="@font/jakarta_bold"
+            android:paddingVertical="14dp"
+            app:icon="@drawable/ic_preview"
+            app:iconGravity="textStart" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:layout_marginBottom="18dp">
+            <Button
+                android:id="@+id/btnCreateList"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/lightBrown"
+                android:text="Create List"
+                android:textSize="18sp"
+                android:fontFamily="@font/jakarta_bold"
+                android:paddingVertical="14dp"
+                android:layout_marginRight="6dp"
+                app:icon="@drawable/ic_add_list"
+                app:iconGravity="textStart" />
+            <Button
+                android:id="@+id/btnAddToList"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/lightBrown"
+                android:text="Add to List"
+                android:fontFamily="@font/jakarta_bold"
+                android:textSize="18sp"
+                android:paddingVertical="14dp"
+                app:icon="@drawable/ic_add_list"
+                app:iconGravity="textStart" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="QUICK REACTIONS"
+            android:fontFamily="@font/jakarta_bold"
+            android:layout_marginBottom="6dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="#E6FFFFFF"
+            android:background="@drawable/rounded_reactions_container">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:orientation="vertical">
+                <ImageView
+                    android:id="@+id/btnLike"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/rc_like"/>
+                <TextView
+                    android:id="@+id/tvLikeCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_gravity="center"
+                    android:text="0"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:orientation="vertical">
+                <ImageView
+                    android:id="@+id/btnFire"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/rc_fire"/>/>
+                <TextView
+                    android:id="@+id/tvFireCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="4dp"
+                    android:text="0"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:orientation="vertical">
+                <ImageView
+                    android:id="@+id/btnHeart"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/rc_heart"/>/>
+                <TextView
+                    android:id="@+id/tvHeartCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="4dp"
+                    android:text="0"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:orientation="vertical">
+                <ImageView
+                    android:id="@+id/btnSad"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/rc_sad"/>/>
+                <TextView
+                    android:id="@+id/tvSadCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="4dp"
+                    android:text="0"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:orientation="vertical">
+                <ImageView
+                    android:id="@+id/btnAngry"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/rc_angry"/>/>
+                <TextView
+                    android:id="@+id/tvAngryCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="4dp"
+                    android:text="1"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/rounded_cnt"
+            android:clipToOutline="true"
+            android:backgroundTint="#66F0F0F8">
+            <View
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="-60dp"
+                android:layout_marginEnd="-60dp"
+                android:background="@drawable/circle_overlay"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Synopsis"
+                    android:textSize="22sp"
+                    android:fontFamily="@font/jakarta_bold"
+                    android:textColor="@color/black"/>
+                <TextView
+                    android:id="@+id/tvDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Text here"
+                    android:fontFamily="@font/jakarta_light"
+                    android:textSize="16sp"
+                    android:layout_marginTop="16dp"
+                    android:justificationMode="inter_word"
+                    android:lineSpacingExtra="6dp"/>
+            </LinearLayout>
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Leave a Review"
+            android:textSize="24sp"
+            android:fontFamily="@font/jakarta_bold"
+            android:textColor="@color/black"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="10dp"
+            android:padding="24dp"
+            android:background="@drawable/rounded_cnt"
+            android:backgroundTint="#4DDBDCE6">
+            <RatingBar
+                android:id="@+id/ratingBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:numStars="5"
+                android:progressTint="@color/yellow"
+                android:secondaryProgressTint="@color/yellow"
+                android:stepSize="1"/>
+
+            <EditText
+                android:id="@+id/etReview"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:hint="Write your thoughts..."
+                android:fontFamily="@font/jakarta_light"
+                android:gravity="top|start"
+                android:padding="12dp"
+                android:inputType="textMultiLine"
+                android:scrollbars="vertical"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/rounded_cntr"/>
+            <Button
+                android:id="@+id/btnSubmitReview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:gravity="right"
+                android:textSize="18sp"
+                android:paddingVertical="18dp"
+                android:paddingHorizontal="32dp"
+                android:backgroundTint="@color/navyBlue"
+                android:text="Post Review"
+                android:fontFamily="@font/jakarta_bold"/>
+        </LinearLayout>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Community Reviews"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:fontFamily="@font/jakarta_bold"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tvNoReviews"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No reviews available."
+            android:fontFamily="@font/jakarta_light"
+            android:textSize="16sp"
+            android:visibility="gone"
+            android:textColor="@color/darkerGray"
+            android:layout_marginBottom="8dp"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvReviews"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
+</ScrollView>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Reviews"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp"/>
 
-    <RatingBar
-        android:id="@+id/ratingBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:numStars="5"
-        android:stepSize="1"/>
-
-    <EditText
-        android:id="@+id/etReview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Write your review..."/>
-
-    <Button
-        android:id="@+id/btnSubmitReview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Submit Review"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvReviews"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-</LinearLayout>

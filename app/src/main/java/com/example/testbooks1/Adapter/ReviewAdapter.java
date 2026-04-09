@@ -32,7 +32,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
             super(itemView);
             tvUser = itemView.findViewById(R.id.tvUser);
             tvComment = itemView.findViewById(R.id.tvComment);
-            //tvTime = itemView.findViewById(R.id.tvTime);
+            tvTime = itemView.findViewById(R.id.tvTime);
             ratingBar = itemView.findViewById(R.id.ratingBarItem);
         }
     }
@@ -52,7 +52,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
         holder.ratingBar.setRating(r.rating);
 
         // simple time display
-        //holder.tvTime.setText(formatTime(r.getTimestamp()));
+        holder.tvTime.setText(formatTime(r.timestamp));
     }
 
     @Override

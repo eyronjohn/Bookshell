@@ -14,6 +14,27 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TestBooks1">
         <activity
+            android:name=".EditListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreateListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ListDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AddToListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AddToList"
+            android:exported="false" />
+        <activity
+            android:name=".SearchPageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SearchActivity"
+            android:exported="false" />
+        <activity
             android:name=".LibraryActivity"
             android:exported="false" />
         <activity

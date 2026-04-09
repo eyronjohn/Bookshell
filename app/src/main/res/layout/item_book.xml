@@ -2,33 +2,49 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="10dp"
-    app:cardElevation="4dp">
-
+    android:layout_margin="10dp"
+    app:cardCornerRadius="28dp"
+    app:cardElevation="2dp">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="8dp">
-
-        <ImageView
+        android:padding="14dp"
+        android:background="@color/lighterGray">
+<!--        <ImageView-->
+<!--            android:id="@+id/ivThumbnail"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="180dp"-->
+<!--            android:scaleType="centerCrop"-->
+<!--            android:src="@android:drawable/ic_menu_gallery"/>-->
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/ivThumbnail"
             android:layout_width="match_parent"
-            android:layout_height="160dp"
+            android:layout_height="190dp"
             android:scaleType="centerCrop"
-            android:src="@android:drawable/ic_menu_gallery" />
-
+            android:layout_gravity="center"
+            android:src="@android:drawable/ic_menu_gallery"
+            app:shapeAppearanceOverlay="@style/bookImage" />
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:ellipsize="end"
-            android:maxLines="2"
-            android:text="Book Title"
+            android:maxLines="1"
+            android:text="Title"
             android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textColor="@color/darkerGray"
+            android:fontFamily="@font/jakarta_extra_bold" />
+        <TextView
+            android:id="@+id/tvAuthor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Author"
+            android:textSize="12sp"
+            android:fontFamily="@font/jakarta_medium"
+            android:textColor="@color/darkGray" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

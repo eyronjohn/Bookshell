@@ -50,4 +50,5 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     implementation("com.android.volley:volley:1.2.1")
     implementation("com.github.bumptech.glide:glide:5.0.5")
+    implementation("androidx.core:core:1.10.1")
 }

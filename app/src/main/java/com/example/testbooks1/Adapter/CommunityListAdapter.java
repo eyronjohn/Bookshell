@@ -4,11 +4,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
+import com.example.testbooks1.Model.CommunityBook;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.testbooks1.CommunityList;
+import com.example.testbooks1.Model.CommunityList;
 import com.example.testbooks1.R;
 
 import java.util.ArrayList;
@@ -28,8 +28,8 @@ public class CommunityListAdapter extends RecyclerView.Adapter<CommunityListAdap
 
         public ViewHolder(View itemView) {
             super(itemView);
-            tvListTitle = itemView.findViewById(R.id.tvListTitle);
-            rvBooksInList = itemView.findViewById(R.id.rvBooksInList);
+            tvListTitle = itemView.findViewById(R.id.tvTitle);
+            rvBooksInList = itemView.findViewById(R.id.communityRecyclerView); //what holder is this
         }
     }
 
@@ -42,9 +42,12 @@ public class CommunityListAdapter extends RecyclerView.Adapter<CommunityListAdap
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         CommunityList list = lists.get(position);
-        holder.tvListTitle.setText(list.listTitle);
+        holder.tvListTitle.setText(list.title);
 
-        CommunityBookAdapter adapter = new CommunityBookAdapter(context, list.books);
+        // Ensure list.books is not null
+        ArrayList<CommunityBook> bookList = list.books != null ? list.books : new ArrayList<>();
+
+        CommunityBookAdapter adapter = new CommunityBookAdapter(context, bookList);
         holder.rvBooksInList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
         holder.rvBooksInList.setAdapter(adapter);
     }

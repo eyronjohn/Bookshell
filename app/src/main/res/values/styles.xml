@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- make the profileImg 100% circular  -->
+    <style name="bookImage">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">6%</item>
+    </style>
+    <style name="singleBookImage">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12%</item>
+    </style>
+    <style name="recommendedBookImage">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">14%</item>
+    </style>
+    <style name="recentlyBookImage">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">24%</item>
+    </style>
+    <style name="OblongImage">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+    <style name="profileImage">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+</resources>

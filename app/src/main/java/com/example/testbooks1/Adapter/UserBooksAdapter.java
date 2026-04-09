@@ -54,16 +54,28 @@ public class UserBooksAdapter extends RecyclerView.Adapter<UserBooksAdapter.View
         holder.checkIcon.setVisibility(isSelected ? View.VISIBLE : View.GONE);
 
         holder.itemView.setOnClickListener(v -> {
-            boolean currentlySelected = selectedBookIds.contains(book.bookId);
+            if (listener != null) {
+                boolean currentlySelected = selectedBookIds.contains(book.bookId);
 
-            if (currentlySelected) {
-                selectedBookIds.remove(book.bookId);
-                if (listener != null) listener.onBookSelected(book, false);
+                if (currentlySelected) {
+                    selectedBookIds.remove(book.bookId);
+                    listener.onBookSelected(book, false);
+                } else {
+                    selectedBookIds.add(book.bookId);
+                    listener.onBookSelected(book, true);
+                }
+                notifyItemChanged(holder.getAdapterPosition());
             } else {
-                selectedBookIds.add(book.bookId);
-                if (listener != null) listener.onBookSelected(book, true);
+                // Default action if no listener: open detail
+                android.content.Intent intent = new android.content.Intent(context, com.example.testbooks1.BookDetailActivity.class);
+                intent.putExtra("bookId", book.bookId);
+                intent.putExtra("title", book.title);
+                intent.putExtra("author", book.author);
+                intent.putExtra("image", book.imageUrl);
+                intent.putExtra("description", book.description);
+                intent.putExtra("category", book.category);
+                context.startActivity(intent);
             }
-            notifyItemChanged(holder.getAdapterPosition());
         });
     }
 

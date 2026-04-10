@@ -40,6 +40,7 @@ public class LibraryActivity extends AppCompatActivity {
 
     // UI Elements
     private View currentlyReadingCard, currentlyReadingHeader, weeklyProgressCard;
+    private TextView tvReadingStreak;
     private MaterialButton btnAll, btnCurrentlyReadingTab;
     private ImageView ivCurrentBookCover;
     private TextView tvCurrentBookTitle, tvCurrentBookAuthor, tvCurrentBookDescription;
@@ -59,6 +60,7 @@ public class LibraryActivity extends AppCompatActivity {
         initViews();
         initialize();
         loadLibraryData();
+        loadReadingStreak();
         
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -75,6 +77,7 @@ public class LibraryActivity extends AppCompatActivity {
         tvCurrentBookTitle = findViewById(R.id.tvCurrentBookTitle);
         tvCurrentBookAuthor = findViewById(R.id.tvCurrentBookAuthor);
         tvCurrentBookDescription = findViewById(R.id.tvCurrentBookDescription);
+        tvReadingStreak = findViewById(R.id.tvReadingStreak);
         btnContinueReading = findViewById(R.id.btnContinueReading);
 
         btnAll = findViewById(R.id.btn_all);
@@ -186,6 +189,32 @@ public class LibraryActivity extends AppCompatActivity {
             intent.putExtra("description", book.description);
             intent.putExtra("category", book.category);
             c.startActivity(intent);
+        });
+    }
+
+    private void loadReadingStreak() {
+        String uid = AuthManager.getUid();
+        if (uid == null) return;
+        DatabaseReference userRef = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(uid)
+                .child("stats");
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Long streakLong = snapshot.child("readingStreak").getValue(Long.class);
+                    int streak = (streakLong != null) ? streakLong.intValue() : 0;
+                    if (streak > 0) {
+                        tvReadingStreak.setText("You're on a " + streak + "-day reading streak! Keep it up.");
+                    } else {
+                        tvReadingStreak.setText("Start your reading streak today!");
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 

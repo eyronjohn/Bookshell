@@ -139,10 +139,11 @@
                     </LinearLayout>
 
                     <TextView
+                        android:id="@+id/tvReadingStreak"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:text="You're on a 4-day reading streak! Keep it up."
+                        android:text=""
                         android:textColor="@color/darkGray"
                         android:textSize="12sp" />
                 </LinearLayout>

@@ -65,21 +65,22 @@ public class BookDetailActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_book_detail);
         c = this;
-        initialize();
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        View mainContent = findViewById(R.id.main);
+        final int basePaddingLeft = mainContent.getPaddingLeft();
+        final int basePaddingTop = mainContent.getPaddingTop();
+        final int basePaddingRight = mainContent.getPaddingRight();
+        final int basePaddingBottom = mainContent.getPaddingBottom();
+        ViewCompat.setOnApplyWindowInsetsListener(mainContent, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            int originalLeft = v.getPaddingLeft();
-            int originalTop = v.getPaddingTop();
-            int originalRight = v.getPaddingRight();
-            int originalBottom = v.getPaddingBottom();
             v.setPadding(
-                    originalLeft + systemBars.left,
-                    originalTop + systemBars.top,
-                    originalRight + systemBars.right,
-                    originalBottom + systemBars.bottom
+                    basePaddingLeft + systemBars.left,
+                    basePaddingTop + systemBars.top,
+                    basePaddingRight + systemBars.right,
+                    basePaddingBottom + systemBars.bottom
             );
             return insets;
         });
+        initialize();
     }
 
     public void initialize(){

@@ -73,12 +73,8 @@ public final class BadgeMilestoneHelper {
         String keyBits = KEY_BITS_PREFIX + uid;
         String keyTier = KEY_TIER_PREFIX + uid;
 
-        if (!prefs.contains(keyBits)) {
-            prefs.edit().putInt(keyBits, newBits).putInt(keyTier, newTier).apply();
-            complete(onComplete);
-            return;
-        }
-
+        // Always compare against stored (or implicit 0) baseline so first-time unlocks
+        // (e.g. Tidal Curator on first shared list) still run the celebration chain.
         int oldBits = prefs.getInt(keyBits, 0);
         int oldTier = prefs.getInt(keyTier, 0);
 

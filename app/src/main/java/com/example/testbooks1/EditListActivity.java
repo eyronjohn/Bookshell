@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.testbooks1.Adapter.UserBooksAdapter;
 import com.example.testbooks1.Model.AuthManager;
 import com.example.testbooks1.Model.CommunityBook;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -59,6 +60,7 @@ public class EditListActivity extends AppCompatActivity {
     //FirebaseUser user;
     String listId;
     Context c;
+    BottomNavigationView bottomNav;
     static final int PICK_IMAGE_REQUEST = 101;
 
     @Override
@@ -103,6 +105,29 @@ public class EditListActivity extends AppCompatActivity {
         ivCoverImage.setOnClickListener(v -> selectCoverImage());
         btnBack.setOnClickListener(v -> finish());
         btnSave.setOnClickListener(v -> saveChanges());
+
+        bottomNav = findViewById(R.id.bottomNavigationView);
+        bottomNav.setSelectedItemId(R.id.nav_community);
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_home) {
+                MainActivity.openHome(c);
+                return true;
+            } else if (id == R.id.nav_search) {
+                startActivity(new Intent(c, SearchActivity.class));
+                return true;
+            } else if (id == R.id.nav_community) {
+                startActivity(new Intent(c, CommunityActivity.class));
+                return true;
+            } else if (id == R.id.nav_library) {
+                startActivity(new Intent(c, LibraryActivity.class));
+                return true;
+            } else if (id == R.id.nav_profile) {
+                startActivity(new Intent(c, ProfileActivity.class));
+                return true;
+            }
+            return false;
+        });
     }
 
     private void loadListData() {

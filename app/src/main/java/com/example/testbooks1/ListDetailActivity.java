@@ -82,7 +82,7 @@ public class ListDetailActivity extends AppCompatActivity {
                 startActivity(new Intent(c, SearchActivity.class));
                 return true;
             } else if (id == R.id.nav_community) {
-                //startActivity(new Intent(c, CommunityActivity.class));
+                startActivity(new Intent(c, CommunityActivity.class));
                 return true;
             } else if (id == R.id.nav_library) {
                 startActivity(new Intent(c, LibraryActivity.class));

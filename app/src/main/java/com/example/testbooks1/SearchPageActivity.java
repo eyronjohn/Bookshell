@@ -99,6 +99,9 @@ public class SearchPageActivity extends AppCompatActivity {
             } else if (id == R.id.nav_search) {
                 startActivity(new Intent(c, SearchActivity.class));
                 return true;
+            } else if (id == R.id.nav_community) {
+                startActivity(new Intent(c, CommunityActivity.class));
+                return true;
             } else if (id == R.id.nav_library) {
                 startActivity(new Intent(c, LibraryActivity.class));
                 return true;

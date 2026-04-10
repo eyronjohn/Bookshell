@@ -2,10 +2,13 @@ package com.example.testbooks1;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -32,8 +35,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchPageActivity extends AppCompatActivity {
-    private static final String TAG = "SearchPageActivity";
 
+    EditText etSearch;
+    TextView tvNoResults;
     ProgressBar progress;
     RecyclerView rvBooks;
     BookAdapter adapter;
@@ -56,6 +60,8 @@ public class SearchPageActivity extends AppCompatActivity {
     }
 
     public void initialize(){
+        etSearch = findViewById(R.id.etSearch);
+        tvNoResults = findViewById(R.id.tvNoResults);
         rvBooks = findViewById(R.id.rvBooks);
         bookList = new ArrayList<>();
         rvBooks.setLayoutManager(new GridLayoutManager(c, 2));
@@ -63,6 +69,24 @@ public class SearchPageActivity extends AppCompatActivity {
         rvBooks.setAdapter(adapter);
         progress = findViewById(R.id.progressBooks);
         progress.setVisibility(View.VISIBLE);
+
+        String query = getIntent().getStringExtra("query");
+        if (query != null && !query.isEmpty()) {
+            etSearch.setText(query);
+            callBooks(query);
+        }
+
+        etSearch.setOnEditorActionListener((v, actionId, event) -> {
+            String searchQuery = etSearch.getText().toString().trim();
+            if(searchQuery.isEmpty()){
+                Toast.makeText(c, "Please enter a search query.", Toast.LENGTH_SHORT).show();
+
+            } if (!searchQuery.isEmpty()) {
+                progress.setVisibility(View.VISIBLE);
+                callBooks(searchQuery);
+            }
+            return true;
+        });
 
         bottomNav = findViewById(R.id.bottomNavigationView);
         bottomNav.setSelectedItemId(R.id.nav_search);
@@ -72,10 +96,7 @@ public class SearchPageActivity extends AppCompatActivity {
                 startActivity(new Intent(c, MainActivity.class));
                 return true;
             } else if (id == R.id.nav_search) {
-                //startActivity(new Intent(c, SearchActivity.class));
-                return true;
-            } else if (id == R.id.nav_community) {
-                startActivity(new Intent(c, CommunityActivity.class));
+                startActivity(new Intent(c, SearchActivity.class));
                 return true;
             } else if (id == R.id.nav_library) {
                 startActivity(new Intent(c, LibraryActivity.class));
@@ -86,29 +107,53 @@ public class SearchPageActivity extends AppCompatActivity {
             }
             return false;
         });
+    }
 
-        String query = getIntent().getStringExtra("query");
-        if (query != null && !query.isEmpty()) {
-            callBooks(query);
+    private boolean isValidQuery(String query) {
+        query = query.trim();
+        if (query.isEmpty()) return false;
+        if (query.length() < 2) return false;
+        int alphaCount = 0;
+        for (char c : query.toCharArray()) {
+            if (Character.isLetter(c)) alphaCount++;
         }
+        double alphaRatio = (double) alphaCount / query.length();
+        return alphaRatio >= 0.5;
     }
 
     public void callBooks(String queryInput) {
-        String query = queryInput.trim().replace(" ", "+");
+        if (!isValidQuery(queryInput)) {
+            progress.setVisibility(View.GONE);
+            tvNoResults.setText("No results found.");
+            tvNoResults.setVisibility(View.VISIBLE);
+            rvBooks.setVisibility(View.GONE);
+            return;
+        }
+
+        bookList.clear();
+        adapter.notifyDataSetChanged();
+
+        //String query = queryInput.trim().replace(" ", "+");
+        String query = Uri.encode(queryInput.trim());
         String url = "https://www.googleapis.com/books/v1/volumes?q=" + query
                 + "&maxResults=10"
+                + "&orderBy=newest"
                 + "&printType=books"
-                + "&filter=ebooks"
-                + "&key=AIzaSyAycxqRNFLfOCxktkf3cDcWChAc0Cfvk4Y";
+                + "&filter=ebooks";
+                //+ "&key=AIzaSyAycxqRNFLfOCxktkf3cDcWChAc0Cfvk4Y";
 
         RequestQueue r = Volley.newRequestQueue(c);
         JsonObjectRequest json = new JsonObjectRequest(Request.Method.GET, url, null,
                 response -> {
                     try {
                         progress.setVisibility(View.GONE);
-                        int previousSize = bookList.size();
-                        bookList.clear();
-                        if (!response.has("items")) return;
+
+                        if (!response.has("items")) {
+                            tvNoResults.setText("No results found.");
+                            tvNoResults.setVisibility(View.VISIBLE);
+                            rvBooks.setVisibility(View.GONE);
+                            return;
+                        }
 
                         JSONArray items = response.getJSONArray("items");
                         for (int i = 0; i < items.length(); i++) {
@@ -133,7 +178,7 @@ public class SearchPageActivity extends AppCompatActivity {
                                 author = authorsArray.getString(0);
                             }
 
-                            String description = volumeInfo.optString("description", "No description available");
+                            String description = volumeInfo.optString("description", "No description available.");
                             String publisher = volumeInfo.optString("publisher", "Unknown");
 
                             String category = "Unknown";
@@ -148,22 +193,43 @@ public class SearchPageActivity extends AppCompatActivity {
                             if (volumeInfo.has("imageLinks")) {
                                 imageUrl = volumeInfo
                                         .getJSONObject("imageLinks")
-                                        .optString("thumbnail", "");
+                                        .optString("thumbnail", "https://img.freepik.com/free-vector/red-text-book-closed-icon_18591-82397.jpg?semt=ais_hybrid&w=740&q=80");
                                 if (imageUrl.startsWith("http://")) {
                                     imageUrl = imageUrl.replace("http://", "https://");
                                 }
                             }
                             bookList.add(new Book(id, title, imageUrl, author, description, publisher, category, readerLink));
                         }
-                        if (previousSize > 0) {
-                            adapter.notifyItemRangeRemoved(0, previousSize);
+
+                        adapter.notifyDataSetChanged();
+                        if (bookList.isEmpty()) {
+                            tvNoResults.setVisibility(View.VISIBLE);
+                            rvBooks.setVisibility(View.GONE);
+                        } else {
+                            tvNoResults.setVisibility(View.GONE);
+                            rvBooks.setVisibility(View.VISIBLE);
                         }
-                        adapter.notifyItemRangeInserted(0, bookList.size());
                     } catch (JSONException e) {
-                        Log.e(TAG, "Failed parsing search results", e);
+                        e.printStackTrace();
                     }
                 },
-                error -> Toast.makeText(c, error.toString(), Toast.LENGTH_SHORT).show()
+                //error -> Toast.makeText(c, error.toString(), Toast.LENGTH_SHORT).show()
+                error -> {
+                    progress.setVisibility(View.GONE);
+                    tvNoResults.setText("No results found.");
+                    tvNoResults.setVisibility(View.VISIBLE);
+                    rvBooks.setVisibility(View.GONE);
+
+                    if (error.networkResponse != null) {
+                        int statusCode = error.networkResponse.statusCode;
+                        String responseData = new String(error.networkResponse.data);
+
+                        Log.e("VOLLEY_ERROR", "Status Code: " + statusCode);
+                        Log.e("VOLLEY_ERROR", "Response: " + responseData);
+                    } else {
+                        Log.e("VOLLEY_ERROR", "Error: " + error.toString());
+                    }
+                }
         );
         r.add(json);
     }

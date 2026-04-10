@@ -72,8 +72,8 @@ public class EditListActivity extends AppCompatActivity {
     }
 
     private void initialize() {
-        etTitle = findViewById(R.id.title);
-        etDescription = findViewById(R.id.description);
+        etTitle = findViewById(R.id.etTitle);
+        etDescription = findViewById(R.id.etDescription);
         ivCoverImage = findViewById(R.id.ivCoverImage);
         tvCoverHint = findViewById(R.id.tvCoverHint);
         rvUserBooks = findViewById(R.id.rvUserBooks);

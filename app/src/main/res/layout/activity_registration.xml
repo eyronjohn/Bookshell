@@ -7,15 +7,12 @@
     android:clipToPadding="false"
     tools:context=".RegistrationActivity">
 
-    <!-- Outer container with padding -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="20dp"
         android:gravity="center_horizontal">
-
-        <!-- Rounded content container -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

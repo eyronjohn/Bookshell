@@ -487,31 +487,24 @@ public class BookDetailActivity extends AppCompatActivity {
         });
     }
 
-    /*
-    private void incrementReaction(String reactionType) {
-        reactionsRef.child(reactionType).get().addOnCompleteListener(task -> {
-            int current = 0;
-            if (task.isSuccessful() && task.getResult().exists()) {
-                current = task.getResult().getValue(Integer.class);
-            }
-            reactionsRef.child(reactionType).setValue(current + 1);
-        });
-    }
-     */
     private void incrementReaction(String reactionType) {
         String uid = AuthManager.getUid();
         if (uid == null) return;
 
-        DatabaseReference reactionRef = reactionsRef.child(reactionType).child(uid);
-        reactionRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                if (!task.getResult().exists()) {
-                    reactionRef.setValue(true);
-                }
+        String[] reactions = {"like", "fire", "heart", "sad", "angry"};
+        DatabaseReference selectedRef = reactionsRef.child(reactionType).child(uid);
+
+        selectedRef.get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) return;
+            boolean alreadySelected = task.getResult().exists();
+            for (String type : reactions) {
+                reactionsRef.child(type).child(uid).removeValue();
+            }
+            if (!alreadySelected) {
+                selectedRef.setValue(true);
             }
         });
     }
-
     private void selectStatus(Button selected, Button ... buttons) {
         for (Button btn : buttons) {
             btn.setBackgroundTintList(getColorStateList(android.R.color.white));

@@ -1,6 +1,7 @@
 package com.example.testbooks1.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.testbooks1.Model.Comment;
 import com.example.testbooks1.R;
+import com.example.testbooks1.ViewProfileActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -72,6 +74,14 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         holder.tvTime.setText(android.text.format.DateUtils.getRelativeTimeSpanString(c.timestamp));
         holder.ivProfileImage.setImageResource(R.drawable.default_pfp);
         bindLiveUserUi(c.userId, holder);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (c.userId != null) {
+                Intent intent = new Intent(context, ViewProfileActivity.class);
+                intent.putExtra("userId", c.userId);
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override

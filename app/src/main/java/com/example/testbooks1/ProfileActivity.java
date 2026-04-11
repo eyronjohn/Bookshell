@@ -609,7 +609,7 @@ public class ProfileActivity extends AppCompatActivity {
         return Math.max(1L, next.getTimeInMillis() - now.getTimeInMillis());
     }
 
-    private static class CurrentlyReadingBook {
+    static class CurrentlyReadingBook {
         String bookId;
         String title;
         String author;
@@ -619,7 +619,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private static class CurrentlyReadingAdapter extends RecyclerView.Adapter<CurrentlyReadingAdapter.BookVH> {
+    static class CurrentlyReadingAdapter extends RecyclerView.Adapter<CurrentlyReadingAdapter.BookVH> {
 
         interface OnBookClickListener {
             void onBookClick(CurrentlyReadingBook book);
@@ -692,7 +692,7 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-    private static class ProfileBadgeAdapter extends RecyclerView.Adapter<ProfileBadgeAdapter.BadgeVH> {
+    static class ProfileBadgeAdapter extends RecyclerView.Adapter<ProfileBadgeAdapter.BadgeVH> {
 
         private final List<BadgeRules.BadgeRow> rows;
 

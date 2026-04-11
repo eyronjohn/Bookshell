@@ -40,7 +40,6 @@ import java.util.Map;
 public class SearchActivity extends AppCompatActivity {
 
     EditText etSearch;
-    TextView tvFantasy, tvCoastalMyths, tvNewReleases, tvMarineBiology, tvClassicSails;
     TextView tvNoRecent, tvNoMostRead;
     RecyclerView rvBooks, rvRecent;
     BookHorizontalAdapter adapter, recentAdapter;
@@ -64,11 +63,6 @@ public class SearchActivity extends AppCompatActivity {
 
     public void initialize(){
         etSearch = findViewById(R.id.etSearch);
-        tvFantasy = findViewById(R.id.tvFantasy);
-        tvCoastalMyths = findViewById(R.id.tvCoastalMyths);
-        tvNewReleases = findViewById(R.id.tvNewReleases);
-        tvMarineBiology = findViewById(R.id.tvMarineBiology);
-        tvClassicSails = findViewById(R.id.tvClassicSails);
         tvNoRecent = findViewById(R.id.tvNoRecent);
         tvNoMostRead = findViewById(R.id.tvNoMostRead);
         rvBooks = findViewById(R.id.rvBooks);
@@ -97,12 +91,6 @@ public class SearchActivity extends AppCompatActivity {
             }
             return true;
         });
-
-        tvFantasy.setOnClickListener(v -> openSearchPage("Fantasy"));
-        tvCoastalMyths.setOnClickListener(v -> openSearchPage("Coastal Myths"));
-        tvNewReleases.setOnClickListener(v -> openSearchPage("New Releases"));
-        tvMarineBiology.setOnClickListener(v -> openSearchPage("Marine Biology"));
-        tvClassicSails.setOnClickListener(v -> openSearchPage("Classic Sails"));
 
         bottomNav = findViewById(R.id.bottomNavigationView);
         bottomNav.setSelectedItemId(R.id.nav_search);

@@ -46,7 +46,7 @@
         app:layout_constraintEnd_toEndOf="parent">
         <EditText
             android:id="@+id/etSearch"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="@string/search_action"
@@ -76,82 +76,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/section_trending_topics"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:fontFamily="@font/jakarta_extra_bold"
-                android:paddingBottom="5dp"
-                style="@style/BookshellBrandLightBlue" />
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="1"
-                android:layout_marginBottom="10dp">
-                <TextView
-                    android:id="@+id/tvFantasy"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/topic_fantasy"
-                    android:fontFamily="@font/jakarta_bold"
-                    android:padding="8dp"
-                    android:backgroundTint="@color/skyBlue"
-                    android:background="@drawable/rounded_search"/>
-                <TextView
-                    android:id="@+id/tvCoastalMyths"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/topic_coastal_myths"
-                    android:fontFamily="@font/jakarta_bold"
-                    android:layout_marginStart="8dp"
-                    android:padding="8dp"
-                    android:backgroundTint="@color/skyBlue"
-                    android:background="@drawable/rounded_search"/>
-                <TextView
-                    android:id="@+id/tvNewReleases"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/topic_new_releases"
-                    android:fontFamily="@font/jakarta_bold"
-                    android:layout_marginStart="8dp"
-                    android:padding="8dp"
-                    android:backgroundTint="@color/skyBlue"
-                    android:background="@drawable/rounded_search"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="10dp">
-                <TextView
-                    android:id="@+id/tvMarineBiology"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/topic_marine_biology"
-                    android:fontFamily="@font/jakarta_bold"
-                    android:padding="8dp"
-                    android:backgroundTint="@color/skyBlue"
-                    android:background="@drawable/rounded_search"/>
-                <TextView
-                    android:id="@+id/tvClassicSails"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/topic_classic_sails"
-                    android:fontFamily="@font/jakarta_bold"
-                    android:layout_marginStart="8dp"
-                    android:padding="8dp"
-                    android:backgroundTint="@color/skyBlue"
-                    android:background="@drawable/rounded_search"/>
-            </LinearLayout>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:text="@string/section_recently_viewed"
                 android:textSize="26sp"
                 android:fontFamily="@font/jakarta_extra_bold"
-                android:textColor="@color/black"
-                android:paddingTop="10dp"/>
+                android:textColor="@color/black"/>
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvRecent"
                 android:layout_width="match_parent"

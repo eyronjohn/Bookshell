@@ -45,8 +45,15 @@ public class ViewProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_profile);
         c = this;
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         userId = getIntent().getStringExtra("userId");
         if (userId == null) {
@@ -56,6 +63,7 @@ public class ViewProfileActivity extends AppCompatActivity {
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         initialize();
+        setupPublicProfileBack();
         disableEditingFeatures();
         loadUserProfile();
         loadUserStats();
@@ -109,6 +117,12 @@ public class ViewProfileActivity extends AppCompatActivity {
         );
 
         recyclerCurrentlyReading.setAdapter(readingAdapter);
+    }
+
+    private void setupPublicProfileBack() {
+        View btnBack = findViewById(R.id.btnBackPublicProfile);
+        btnBack.setVisibility(View.VISIBLE);
+        btnBack.setOnClickListener(v -> finish());
     }
 
     private void disableEditingFeatures() {

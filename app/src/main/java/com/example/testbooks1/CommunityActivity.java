@@ -49,6 +49,7 @@ public class CommunityActivity extends AppCompatActivity {
         setContentView(R.layout.item_community_list);
         c = this;
         initialize();
+        loadCommunityData();
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -88,12 +89,6 @@ public class CommunityActivity extends AppCompatActivity {
             }
             return false;
         });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        loadCommunityData();
     }
 
     @Override

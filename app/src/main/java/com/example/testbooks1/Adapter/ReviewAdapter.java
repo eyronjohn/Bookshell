@@ -1,6 +1,7 @@
 package com.example.testbooks1.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.testbooks1.R;
 import com.example.testbooks1.Model.Review;
+import com.example.testbooks1.ViewProfileActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -79,6 +81,16 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
         // simple time display
         holder.tvTime.setText(formatTime(r.timestamp));
         bindLiveUserUi(r.userId, holder);
+
+        View.OnClickListener openProfile = v -> {
+            if (r.userId != null && !r.userId.trim().isEmpty()) {
+                Intent intent = new Intent(context, ViewProfileActivity.class);
+                intent.putExtra("userId", r.userId);
+                context.startActivity(intent);
+            }
+        };
+        holder.ivProfileImage.setOnClickListener(openProfile);
+        holder.tvUser.setOnClickListener(openProfile);
     }
 
     @Override

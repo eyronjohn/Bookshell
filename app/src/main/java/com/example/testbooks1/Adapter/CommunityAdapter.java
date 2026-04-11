@@ -109,6 +109,7 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
             context.startActivity(intent);
         };
         holder.ivProfileImage.setOnClickListener(openProfile);
+        holder.tvFullName.setOnClickListener(openProfile);
 
         if (item.coverImage != null && !item.coverImage.isEmpty()) {
             try {

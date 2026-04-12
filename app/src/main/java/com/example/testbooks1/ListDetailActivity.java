@@ -2,9 +2,12 @@ package com.example.testbooks1;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -55,11 +59,20 @@ public class ListDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_list_detail);
         c = this;
         initialize();
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+        final int topAndSides = WindowInsetsCompat.Type.statusBars() | WindowInsetsCompat.Type.displayCutout();
+        View mainRoot = findViewById(R.id.main);
+        View bottomBar = findViewById(R.id.bottomNavigationView);
+        ViewCompat.setOnApplyWindowInsetsListener(mainRoot, (v, insets) -> {
+            Insets b = insets.getInsets(topAndSides);
+            v.setPadding(b.left, b.top, b.right, 0);
             return insets;
         });
+        ViewCompat.setOnApplyWindowInsetsListener(bottomBar, (v, insets) -> {
+            Insets nav = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+            v.setPadding(0, 0, 0, nav.bottom);
+            return insets;
+        });
+        attachKeyboardScrollPadding(findViewById(R.id.scrollView), findViewById(R.id.list_detail_root_content));
     }
 
     public void initialize(){
@@ -68,6 +81,12 @@ public class ListDetailActivity extends AppCompatActivity {
         tvListTitle.setText(getIntent().getStringExtra("listTitle"));
         tvListDescription.setText(getIntent().getStringExtra("listDescription"));
         etComment = findViewById(R.id.etComment);
+        View listScroll = findViewById(R.id.scrollView);
+        etComment.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                ensureFieldVisibleScroll(listScroll, v);
+            }
+        });
         btnSubmitComment = findViewById(R.id.btnSubmitComment);
         btnBack = findViewById(R.id.btnBack);
 
@@ -190,6 +209,9 @@ public class ListDetailActivity extends AppCompatActivity {
 
     private void loadBooks() {
         String listId = getIntent().getStringExtra("listId");
+        if (listId == null || listId.isEmpty()) {
+            return;
+        }
 
         DatabaseReference db = FirebaseDatabase.getInstance().getReference();
         db.child("communityLists")
@@ -239,6 +261,49 @@ public class ListDetailActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    private void attachKeyboardScrollPadding(View scroll, View content) {
+        final int pl = content.getPaddingLeft();
+        final int pt = content.getPaddingTop();
+        final int pr = content.getPaddingRight();
+        final int pbBase = content.getPaddingBottom();
+        final View root = scroll.getRootView();
+        final float density = getResources().getDisplayMetrics().density;
+        scroll.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            Rect r = new Rect();
+            scroll.getWindowVisibleDisplayFrame(r);
+            int rootH = root.getHeight();
+            int keypad = Math.max(0, rootH - r.bottom);
+            int slack = (int) (24 * density);
+            int minKeyboard = Math.max((int) (rootH * 0.13f), (int) (180 * density));
+            int extra = keypad > minKeyboard ? keypad + slack : 0;
+            int want = pbBase + extra;
+            if (content.getPaddingBottom() != want) {
+                content.setPadding(pl, pt, pr, want);
+            }
+        });
+    }
+
+    private void ensureFieldVisibleScroll(View scrollView, View field) {
+        final int gapPx = (int) (48 * getResources().getDisplayMetrics().density);
+        field.post(() -> {
+            int[] fLoc = new int[2];
+            int[] sLoc = new int[2];
+            field.getLocationOnScreen(fLoc);
+            scrollView.getLocationOnScreen(sLoc);
+            int fieldBottom = fLoc[1] + field.getHeight();
+            int visibleBottom = sLoc[1] + scrollView.getHeight() - scrollView.getPaddingBottom();
+            int delta = fieldBottom - visibleBottom + gapPx;
+            if (delta <= 0) {
+                return;
+            }
+            if (scrollView instanceof ScrollView) {
+                ((ScrollView) scrollView).smoothScrollBy(0, delta);
+            } else if (scrollView instanceof NestedScrollView) {
+                ((NestedScrollView) scrollView).smoothScrollBy(0, delta);
+            }
         });
     }
 }

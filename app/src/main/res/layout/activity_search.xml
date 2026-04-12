@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/lightWhite">
 
     <LinearLayout
         android:id="@+id/topBar"
@@ -47,13 +48,15 @@
         app:layout_constraintEnd_toEndOf="parent">
         <EditText
             android:id="@+id/etSearch"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="@string/search_action"
             android:background="@drawable/rounded_search"
             android:padding="10dp"
             android:inputType="text"
+            android:maxLines="1"
+            android:imeOptions="actionSearch"
             android:fontFamily="@font/jakarta_light"
             android:drawableStart="@drawable/ic_search"
             android:drawablePadding="8dp"
@@ -130,7 +133,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:menu="@menu/bottom_nav"
-        app:itemIconTint="@color/black"
-        app:itemTextColor="@color/black"
+        android:background="@color/white"
+        app:itemIconTint="@color/bottom_nav_item_tint"
+        app:itemTextColor="@color/bottom_nav_item_tint"
         app:labelVisibilityMode="labeled"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

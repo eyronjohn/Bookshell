@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
@@ -39,7 +38,6 @@ public class ViewProfileActivity extends AppCompatActivity {
     private final ArrayList<BadgeRules.BadgeRow> badgeRows = new ArrayList<>();
     private final ArrayList<ProfileActivity.CurrentlyReadingBook> readingList = new ArrayList<>();
     private View[] streakBars;
-    private DatabaseReference mDatabase;
     private String userId;
     private Context c;
 
@@ -50,9 +48,17 @@ public class ViewProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         c = this;
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+        final int topAndSides = WindowInsetsCompat.Type.statusBars() | WindowInsetsCompat.Type.displayCutout();
+        View mainRoot = findViewById(R.id.main);
+        View bottomBar = findViewById(R.id.bottomNavigationView);
+        ViewCompat.setOnApplyWindowInsetsListener(mainRoot, (v, insets) -> {
+            Insets b = insets.getInsets(topAndSides);
+            v.setPadding(b.left, b.top, b.right, 0);
+            return insets;
+        });
+        ViewCompat.setOnApplyWindowInsetsListener(bottomBar, (v, insets) -> {
+            Insets nav = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+            v.setPadding(0, 0, 0, nav.bottom);
             return insets;
         });
 
@@ -62,7 +68,6 @@ public class ViewProfileActivity extends AppCompatActivity {
             return;
         }
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
         initialize();
         setupPublicProfileBack();
         disableEditingFeatures();
@@ -134,7 +139,7 @@ public class ViewProfileActivity extends AppCompatActivity {
     }
 
     private void loadUserProfile() {
-        mDatabase.child("users").child(userId)
+        FirebaseDatabase.getInstance().getReference().child("users").child(userId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -150,7 +155,7 @@ public class ViewProfileActivity extends AppCompatActivity {
                         tvProfileBio.setVisibility(View.VISIBLE);
                         ivProfileImage.setVisibility(View.VISIBLE);
 
-                        tvFullName.setText(full.isEmpty() ? "Anonymous" : full);
+                        tvFullName.setText(full.isEmpty() ? getString(R.string.profile_name_anonymous) : full);
 
                         String role = snapshot.child("role").getValue(String.class);
                         String level = snapshot.child("level").getValue(String.class);
@@ -163,7 +168,7 @@ public class ViewProfileActivity extends AppCompatActivity {
                         tvProfileLevel.setVisibility(View.VISIBLE);
 
                         if (bio == null || bio.trim().isEmpty()) {
-                            tvProfileBio.setText("This user has not set their biography yet.");
+                            tvProfileBio.setText(R.string.profile_bio_empty_other);
                         } else {
                             tvProfileBio.setText(bio);
                         }
@@ -184,7 +189,7 @@ public class ViewProfileActivity extends AppCompatActivity {
     }
 
     private void loadUserStats() {
-        mDatabase.child("users").child(userId).child("stats")
+        FirebaseDatabase.getInstance().getReference().child("users").child(userId).child("stats")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -206,8 +211,9 @@ public class ViewProfileActivity extends AppCompatActivity {
                         badgeAdapter.notifyDataSetChanged();
 
                         tvBooksCount.setText(String.valueOf(completed));
-                        tvBadgesCount.setText(unlocked + "/" + BadgeRules.TOTAL_BADGES);
-                        tvStreakDays.setText(streak + " days");
+                        tvBadgesCount.setText(getString(R.string.badges_unlocked_count_format,
+                                (int) unlocked, BadgeRules.TOTAL_BADGES));
+                        tvStreakDays.setText(getString(R.string.view_profile_streak_days, streak));
 
                         tvProfileLevel.setText(
                                 BadgeRules.levelNameForUnlockedCount(ViewProfileActivity.this, (int) unlocked)
@@ -228,7 +234,7 @@ public class ViewProfileActivity extends AppCompatActivity {
     }
 
     private void listenCurrentlyReading() {
-        mDatabase.child("user_books").child(userId)
+        FirebaseDatabase.getInstance().getReference().child("user_books").child(userId)
                 .orderByChild("status")
                 .equalTo("Currently Reading")
                 .addValueEventListener(new ValueEventListener() {

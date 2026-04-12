@@ -141,7 +141,7 @@
     <string name="title_confirm_logout">Log out of BookShell?</string>
     <string name="msg_confirm_logout">You can always sign back in later.</string>
     <string name="bio_default_text">This user has not set their biography yet.</string>
-    <string name="bio_edit_hint">Optional — share what you like to read.</string>
+    <string name="bio_edit_hint">Share your interests.</string>
     <string name="label_bio">Bio</string>
     <string name="action_save_changes">Save Changes</string>
     <string name="action_cancel_changes">Cancel</string>
@@ -291,4 +291,17 @@
     <string name="author_by_line">by %1$s</string>
     <string name="toast_enter_search_query">Please enter a search query.</string>
     <string name="no_ratings">No ratings yet.</string>
+    <string name="profile_name_anonymous">Anonymous</string>
+    <string name="profile_bio_empty_other">This user has not set their biography yet.</string>
+    <string name="view_profile_streak_days">%1$d days</string>
+    <string name="search_filter_title">Title</string>
+    <string name="search_filter_author">Author</string>
+    <string name="rating_star_symbol">★</string>
+    <string name="list_detail_title_placeholder">List Title</string>
+    <string name="list_detail_description_placeholder">Text here</string>
+    <string name="list_detail_collection_label">The Collection</string>
+    <string name="list_detail_comment_hint">Add a comment</string>
+    <string name="cd_list_detail_back">Back</string>
+    <string name="cd_list_detail_cover">List cover</string>
+    <string name="cd_list_detail_send_comment">Send comment</string>
 </resources>

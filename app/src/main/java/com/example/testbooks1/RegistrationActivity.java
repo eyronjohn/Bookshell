@@ -1,6 +1,7 @@
 package com.example.testbooks1;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -15,6 +16,7 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,15 +50,15 @@ public class RegistrationActivity extends AppCompatActivity {
         final int baseRight = root.getPaddingRight();
         final int baseBottom = root.getPaddingBottom();
         ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
-            int insetTypes = WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime();
-            Insets combined = insets.getInsets(insetTypes);
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(
-                    baseLeft + combined.left,
-                    baseTop + combined.top,
-                    baseRight + combined.right,
-                    baseBottom + combined.bottom);
+                    baseLeft + bars.left,
+                    baseTop + bars.top,
+                    baseRight + bars.right,
+                    baseBottom + bars.bottom);
             return insets;
         });
+        attachKeyboardScrollPadding(root, findViewById(R.id.register_root_content));
         initialize();
     }
 
@@ -69,6 +71,16 @@ public class RegistrationActivity extends AppCompatActivity {
         registerBtn = findViewById(R.id.registerBtn);
         tvAlreadyRegistered = findViewById(R.id.tvAlreadyRegistered);
         mAuth = FirebaseAuth.getInstance();
+
+        View.OnFocusChangeListener scrollFocusedField = (v, hasFocus) -> {
+            if (hasFocus) {
+                ensureFieldVisibleWithKeyboard(v);
+            }
+        };
+        fNameET.setOnFocusChangeListener(scrollFocusedField);
+        lNameET.setOnFocusChangeListener(scrollFocusedField);
+        etEmail.setOnFocusChangeListener(scrollFocusedField);
+        etPassword.setOnFocusChangeListener(scrollFocusedField);
 
         registerBtn.setOnClickListener(view -> {
             String fName = fNameET.getText().toString().trim();
@@ -149,8 +161,50 @@ public class RegistrationActivity extends AppCompatActivity {
         });
 
         tvAlreadyRegistered.setOnClickListener(v -> {
-            Intent intent = new Intent(c, LoginActivity.class); //loginActivity
+            Intent intent = new Intent(c, LoginActivity.class);
             startActivity(intent);
+        });
+    }
+
+    private void attachKeyboardScrollPadding(View scroll, View content) {
+        final int pl = content.getPaddingLeft();
+        final int pt = content.getPaddingTop();
+        final int pr = content.getPaddingRight();
+        final int pbBase = content.getPaddingBottom();
+        final View root = scroll.getRootView();
+        final float density = getResources().getDisplayMetrics().density;
+        scroll.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            Rect r = new Rect();
+            scroll.getWindowVisibleDisplayFrame(r);
+            int rootH = root.getHeight();
+            int keypad = Math.max(0, rootH - r.bottom);
+            int slack = (int) (24 * density);
+            int minKeyboard = Math.max((int) (rootH * 0.13f), (int) (180 * density));
+            int extra = keypad > minKeyboard ? keypad + slack : 0;
+            int want = pbBase + extra;
+            if (content.getPaddingBottom() != want) {
+                content.setPadding(pl, pt, pr, want);
+            }
+        });
+    }
+
+    private void ensureFieldVisibleWithKeyboard(View field) {
+        ScrollView scroll = findViewById(R.id.activity_registration);
+        if (scroll == null) {
+            return;
+        }
+        final int gapPx = (int) (56 * getResources().getDisplayMetrics().density);
+        field.post(() -> {
+            int[] fLoc = new int[2];
+            int[] sLoc = new int[2];
+            field.getLocationOnScreen(fLoc);
+            scroll.getLocationOnScreen(sLoc);
+            int fieldBottom = fLoc[1] + field.getHeight();
+            int visibleBottom = sLoc[1] + scroll.getHeight() - scroll.getPaddingBottom();
+            int delta = fieldBottom - visibleBottom + gapPx;
+            if (delta > 0) {
+                scroll.smoothScrollBy(0, delta);
+            }
         });
     }
 }

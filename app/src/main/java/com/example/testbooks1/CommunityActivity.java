@@ -50,9 +50,17 @@ public class CommunityActivity extends AppCompatActivity {
         c = this;
         initialize();
         loadCommunityData();
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+        final int topAndSides = WindowInsetsCompat.Type.statusBars() | WindowInsetsCompat.Type.displayCutout();
+        View mainRoot = findViewById(R.id.main);
+        View bottomBar = findViewById(R.id.bottomNavigationView);
+        ViewCompat.setOnApplyWindowInsetsListener(mainRoot, (v, insets) -> {
+            Insets b = insets.getInsets(topAndSides);
+            v.setPadding(b.left, b.top, b.right, 0);
+            return insets;
+        });
+        ViewCompat.setOnApplyWindowInsetsListener(bottomBar, (v, insets) -> {
+            Insets nav = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+            v.setPadding(0, 0, 0, nav.bottom);
             return insets;
         });
     }
@@ -142,7 +150,8 @@ public class CommunityActivity extends AppCompatActivity {
                     }
 
                     String firstBookImage = !books.isEmpty() ? books.get(0).imageUrl : null;
-                    String userId = listSnap.getRef().getParent().getKey();
+                    DatabaseReference listParent = listSnap.getRef().getParent();
+                    String userId = listParent != null ? listParent.getKey() : null;
                     final String fUserId = userId;
                     if (userId == null) {
                         synchronized (loadedBuffer) {

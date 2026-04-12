@@ -81,9 +81,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         c = this;
         initialize();
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+        final int topAndSides = WindowInsetsCompat.Type.statusBars() | WindowInsetsCompat.Type.displayCutout();
+        View mainRoot = findViewById(R.id.main);
+        View bottomBar = findViewById(R.id.bottomNavigationView);
+        ViewCompat.setOnApplyWindowInsetsListener(mainRoot, (v, insets) -> {
+            Insets b = insets.getInsets(topAndSides);
+            v.setPadding(b.left, b.top, b.right, 0);
+            return insets;
+        });
+        ViewCompat.setOnApplyWindowInsetsListener(bottomBar, (v, insets) -> {
+            Insets nav = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+            v.setPadding(0, 0, 0, nav.bottom);
             return insets;
         });
     }

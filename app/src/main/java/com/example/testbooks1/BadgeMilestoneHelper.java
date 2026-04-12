@@ -40,22 +40,37 @@ public final class BadgeMilestoneHelper {
                                             @NonNull Context appContext,
                                             @NonNull String uid,
                                             @Nullable DataSnapshot statsSnapshot) {
-        processStatsSnapshot(activity, appContext, uid, statsSnapshot, null);
+        processStatsSnapshot(activity, appContext, uid, statsSnapshot, null, false, 0, 0);
     }
 
     public static void runAfterStatsCelebrations(@Nullable Activity activity,
                                                  @NonNull Context appContext,
                                                  @NonNull String uid,
                                                  @Nullable DataSnapshot statsSnapshot,
-                                                 @NonNull Runnable onComplete) {
-        processStatsSnapshot(activity, appContext, uid, statsSnapshot, onComplete);
+                                                 @NonNull Runnable onComplete,
+                                                 int baselineBits,
+                                                 int baselineTier) {
+        processStatsSnapshot(activity, appContext, uid, statsSnapshot, onComplete, true, baselineBits, baselineTier);
     }
 
-    public static void processStatsSnapshot(@Nullable Activity activity,
+    public static int getStoredBadgeBits(@NonNull Context appContext, @NonNull String uid) {
+        SharedPreferences prefs = appContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        return prefs.getInt(KEY_BITS_PREFIX + uid, 0);
+    }
+
+    public static int getStoredBadgeTier(@NonNull Context appContext, @NonNull String uid) {
+        SharedPreferences prefs = appContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        return prefs.getInt(KEY_TIER_PREFIX + uid, 0);
+    }
+
+    private static void processStatsSnapshot(@Nullable Activity activity,
                                             @NonNull Context appContext,
                                             @NonNull String uid,
                                             @Nullable DataSnapshot statsSnapshot,
-                                            @Nullable Runnable onComplete) {
+                                            @Nullable Runnable onComplete,
+                                            boolean useCapturedBaseline,
+                                            int capturedBaselineBits,
+                                            int capturedBaselineTier) {
         long completed = 0;
         long reviews = 0;
         long readingLists = 0;
@@ -73,10 +88,8 @@ public final class BadgeMilestoneHelper {
         String keyBits = KEY_BITS_PREFIX + uid;
         String keyTier = KEY_TIER_PREFIX + uid;
 
-        // Always compare against stored (or implicit 0) baseline so first-time unlocks
-        // (e.g. Tidal Curator on first shared list) still run the celebration chain.
-        int oldBits = prefs.getInt(keyBits, 0);
-        int oldTier = prefs.getInt(keyTier, 0);
+        int oldBits = useCapturedBaseline ? capturedBaselineBits : prefs.getInt(keyBits, 0);
+        int oldTier = useCapturedBaseline ? capturedBaselineTier : prefs.getInt(keyTier, 0);
 
         if (oldBits == newBits && oldTier == newTier) {
             completeDeferringToPostedUi(onComplete);

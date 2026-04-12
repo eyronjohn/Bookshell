@@ -45,7 +45,6 @@ public class LibraryActivity extends AppCompatActivity {
     private Context c;
 
     private View currentlyReadingCard, currentlyReadingHeader;
-    private MaterialButton btnAll, btnCurrentlyReadingTab;
     private ImageView ivCurrentBookCover;
     private TextView tvCurrentBookTitle, tvCurrentBookAuthor, tvCurrentBookDescription;
     private MaterialButton btnContinueReading;
@@ -75,9 +74,17 @@ public class LibraryActivity extends AppCompatActivity {
         loadLibraryData();
         listenLibraryStreak();
         
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+        final int topAndSides = WindowInsetsCompat.Type.statusBars() | WindowInsetsCompat.Type.displayCutout();
+        View mainRoot = findViewById(R.id.main);
+        View bottomBar = findViewById(R.id.bottomNavigationView);
+        ViewCompat.setOnApplyWindowInsetsListener(mainRoot, (v, insets) -> {
+            Insets b = insets.getInsets(topAndSides);
+            v.setPadding(b.left, b.top, b.right, 0);
+            return insets;
+        });
+        ViewCompat.setOnApplyWindowInsetsListener(bottomBar, (v, insets) -> {
+            Insets nav = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+            v.setPadding(0, 0, 0, nav.bottom);
             return insets;
         });
     }
@@ -92,8 +99,6 @@ public class LibraryActivity extends AppCompatActivity {
         tvCurrentBookDescription = findViewById(R.id.tvCurrentBookDescription);
         btnContinueReading = findViewById(R.id.btnContinueReading);
 
-        //btnAll = findViewById(R.id.btn_all);
-        //btnCurrentlyReadingTab = findViewById(R.id.btn_currently_reading_tab);
         rvWantToRead = findViewById(R.id.rvWantToRead);
         tvWantToReadEmpty = findViewById(R.id.tvWantToReadEmpty);
         readShelfHeader = findViewById(R.id.readShelfHeader);
@@ -110,9 +115,6 @@ public class LibraryActivity extends AppCompatActivity {
                 findViewById(R.id.weekly_dot_6),
         };
 
-        //btnAll.setOnClickListener(v -> updateTabUI(true));
-        //btnCurrentlyReadingTab.setOnClickListener(v -> updateTabUI(false));
-
         wantToReadList = new ArrayList<>();
         wantToReadAdapter = new UserBooksAdapter(c, wantToReadList, new HashSet<>(), null);
         rvWantToRead.setLayoutManager(new GridLayoutManager(this, 2));
@@ -124,38 +126,6 @@ public class LibraryActivity extends AppCompatActivity {
         rvRead.setLayoutManager(new GridLayoutManager(this, 2));
         rvRead.setAdapter(readAdapter);
         applyReadEmptyState();
-    }
-
-    private void updateTabUI(boolean isAll) {
-        View wantToReadHeader = findViewById(R.id.wantToReadHeader);
-        if (isAll) {
-            btnAll.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getColor(R.color.navyBlue)));
-            btnAll.setTextColor(getColor(R.color.white));
-            btnCurrentlyReadingTab.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getColor(R.color.white)));
-            btnCurrentlyReadingTab.setTextColor(getColor(R.color.darkGray));
-
-            currentlyReadingHeader.setVisibility(currentlyReadingCard.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
-            wantToReadHeader.setVisibility(View.VISIBLE);
-            readShelfHeader.setVisibility(View.VISIBLE);
-            applyWantToReadEmptyState();
-            applyReadEmptyState();
-        } else {
-            btnCurrentlyReadingTab.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getColor(R.color.navyBlue)));
-            btnCurrentlyReadingTab.setTextColor(getColor(R.color.white));
-            btnAll.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getColor(R.color.white)));
-            btnAll.setTextColor(getColor(R.color.darkGray));
-
-            rvWantToRead.setVisibility(View.GONE);
-            wantToReadHeader.setVisibility(View.GONE);
-            if (tvWantToReadEmpty != null) {
-                tvWantToReadEmpty.setVisibility(View.GONE);
-            }
-            readShelfHeader.setVisibility(View.GONE);
-            rvRead.setVisibility(View.GONE);
-            if (tvReadEmpty != null) {
-                tvReadEmpty.setVisibility(View.GONE);
-            }
-        }
     }
 
     private void applyWantToReadEmptyState() {

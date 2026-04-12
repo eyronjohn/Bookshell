@@ -2,6 +2,7 @@ package com.example.testbooks1;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.NestedScrollView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -43,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         c = this;
         applySafeAreaPaddingOnce();
+        attachKeyboardScrollPadding(findViewById(R.id.main), findViewById(R.id.login_root_content));
         initialize();
     }
 
@@ -53,13 +56,12 @@ public class LoginActivity extends AppCompatActivity {
         final int baseRight = main.getPaddingRight();
         final int baseBottom = main.getPaddingBottom();
         ViewCompat.setOnApplyWindowInsetsListener(main, (v, insets) -> {
-            int insetTypes = WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime();
-            Insets combined = insets.getInsets(insetTypes);
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(
-                    baseLeft + combined.left,
-                    baseTop + combined.top,
-                    baseRight + combined.right,
-                    baseBottom + combined.bottom);
+                    baseLeft + bars.left,
+                    baseTop + bars.top,
+                    baseRight + bars.right,
+                    baseBottom + bars.bottom);
             return insets;
         });
     }
@@ -70,6 +72,14 @@ public class LoginActivity extends AppCompatActivity {
         loginBtn = findViewById(R.id.loginBtn);
         tvNotRegistered = findViewById(R.id.tvNotRegistered);
         mAuth = FirebaseAuth.getInstance();
+
+        View.OnFocusChangeListener scrollFocusedField = (v, hasFocus) -> {
+            if (hasFocus) {
+                ensureFieldVisibleWithKeyboard(v);
+            }
+        };
+        etEmail.setOnFocusChangeListener(scrollFocusedField);
+        etPassword.setOnFocusChangeListener(scrollFocusedField);
 
         loginBtn.setOnClickListener(view -> {
             String email = etEmail.getText().toString().trim();
@@ -126,5 +136,48 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         tvNotRegistered.setOnClickListener(v -> startActivity(new Intent(c, RegistrationActivity.class)));
+    }
+
+    private void attachKeyboardScrollPadding(View scroll, View content) {
+        final int pl = content.getPaddingLeft();
+        final int pt = content.getPaddingTop();
+        final int pr = content.getPaddingRight();
+        final int pbBase = content.getPaddingBottom();
+        final View root = scroll.getRootView();
+        final float density = getResources().getDisplayMetrics().density;
+        scroll.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            Rect r = new Rect();
+            scroll.getWindowVisibleDisplayFrame(r);
+            int rootH = root.getHeight();
+            int keypad = Math.max(0, rootH - r.bottom);
+            int slack = (int) (24 * density);
+            int minKeyboard = Math.max((int) (rootH * 0.13f), (int) (180 * density));
+            int extra = keypad > minKeyboard ? keypad + slack : 0;
+            int want = pbBase + extra;
+            if (content.getPaddingBottom() != want) {
+                content.setPadding(pl, pt, pr, want);
+            }
+        });
+    }
+
+    private void ensureFieldVisibleWithKeyboard(View field) {
+        View main = findViewById(R.id.main);
+        if (!(main instanceof NestedScrollView)) {
+            return;
+        }
+        NestedScrollView scroll = (NestedScrollView) main;
+        final int gapPx = (int) (48 * getResources().getDisplayMetrics().density);
+        field.post(() -> {
+            int[] fLoc = new int[2];
+            int[] sLoc = new int[2];
+            field.getLocationOnScreen(fLoc);
+            scroll.getLocationOnScreen(sLoc);
+            int fieldBottom = fLoc[1] + field.getHeight();
+            int visibleBottom = sLoc[1] + scroll.getHeight() - scroll.getPaddingBottom();
+            int delta = fieldBottom - visibleBottom + gapPx;
+            if (delta > 0) {
+                scroll.smoothScrollBy(0, delta);
+            }
+        });
     }
 }

@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.testbooks1.Adapter.UserBooksAdapter;
 import com.example.testbooks1.BadgeMilestoneHelper;
+import com.example.testbooks1.BadgeRules;
 import com.example.testbooks1.Model.AuthManager;
 import com.example.testbooks1.Model.CommunityBook;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -68,9 +71,17 @@ public class CreateListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_list);
         c = this;
         initialize();
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+        final int topAndSides = WindowInsetsCompat.Type.statusBars() | WindowInsetsCompat.Type.displayCutout();
+        View mainRoot = findViewById(R.id.main);
+        View bottomBar = findViewById(R.id.bottomNavigationView);
+        ViewCompat.setOnApplyWindowInsetsListener(mainRoot, (v, insets) -> {
+            Insets b = insets.getInsets(topAndSides);
+            v.setPadding(b.left, b.top, b.right, 0);
+            return insets;
+        });
+        ViewCompat.setOnApplyWindowInsetsListener(bottomBar, (v, insets) -> {
+            Insets nav = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+            v.setPadding(0, 0, 0, nav.bottom);
             return insets;
         });
     }
@@ -236,37 +247,81 @@ public class CreateListActivity extends AppCompatActivity {
     }
 
     private void publishStatsAndFinish(String uid) {
-        DatabaseReference statsRef = FirebaseDatabase.getInstance()
+        int baselineBits = BadgeMilestoneHelper.getStoredBadgeBits(getApplicationContext(), uid);
+        int baselineTier = BadgeMilestoneHelper.getStoredBadgeTier(getApplicationContext(), uid);
+        DatabaseReference readingListsRef = FirebaseDatabase.getInstance()
                 .getReference("users")
                 .child(uid)
                 .child("stats")
                 .child("readingLists");
-        statsRef.setValue(ServerValue.increment(1)).addOnCompleteListener(task -> {
-            if (!task.isSuccessful()) {
-                btnShare.setEnabled(true);
-                Toast.makeText(c, R.string.toast_share_list_failed, Toast.LENGTH_LONG).show();
-                return;
-            }
-            FirebaseDatabase.getInstance().getReference("users").child(uid).child("stats").get()
-                    .addOnCompleteListener(t2 -> {
+        readingListsRef.get().addOnCompleteListener(before -> {
+            long rlBefore = longFromLeafSnapshot(before.isSuccessful() ? before.getResult() : null);
+            readingListsRef.setValue(ServerValue.increment(1)).addOnCompleteListener(task -> {
+                if (!task.isSuccessful()) {
+                    btnShare.setEnabled(true);
+                    Toast.makeText(c, R.string.toast_share_list_failed, Toast.LENGTH_LONG).show();
+                    return;
+                }
+                fetchFullStatsAfterReadingListIncrement(uid, baselineBits, baselineTier, rlBefore, 0);
+            });
+        });
+    }
+
+    private static long longFromLeafSnapshot(@Nullable DataSnapshot n) {
+        if (n == null || !n.exists()) {
+            return 0L;
+        }
+        Long l = n.getValue(Long.class);
+        if (l != null) {
+            return l;
+        }
+        Integer i = n.getValue(Integer.class);
+        return i != null ? i.longValue() : 0L;
+    }
+
+    private void fetchFullStatsAfterReadingListIncrement(
+            String uid, int baselineBits, int baselineTier, long rlBefore, int attempt) {
+        FirebaseDatabase.getInstance().getReference("users").child(uid).child("stats").get()
+                .addOnCompleteListener(t2 -> {
+                    if (isFinishing()) {
+                        return;
+                    }
+                    Runnable done = () -> {
                         if (isFinishing()) {
                             return;
                         }
-                        Runnable done = () -> {
-                            if (isFinishing()) {
-                                return;
-                            }
-                            Toast.makeText(c, R.string.toast_list_shared_success, Toast.LENGTH_SHORT).show();
-                            finish();
-                        };
-                        if (t2.isSuccessful() && t2.getResult() != null) {
-                            BadgeMilestoneHelper.runAfterStatsCelebrations(
-                                    CreateListActivity.this, getApplicationContext(), uid, t2.getResult(), done);
+                        Toast.makeText(c, R.string.toast_list_shared_success, Toast.LENGTH_SHORT).show();
+                        finish();
+                    };
+                    if (!t2.isSuccessful() || t2.getResult() == null) {
+                        if (attempt < 12) {
+                            new Handler(Looper.getMainLooper()).postDelayed(
+                                    () -> fetchFullStatsAfterReadingListIncrement(
+                                            uid, baselineBits, baselineTier, rlBefore, attempt + 1),
+                                    80);
                         } else {
                             done.run();
                         }
-                    });
-        });
+                        return;
+                    }
+                    DataSnapshot snap = t2.getResult();
+                    long rl = BadgeRules.readStatLong(snap, "readingLists");
+                    if (rl < rlBefore + 1 && attempt < 12) {
+                        new Handler(Looper.getMainLooper()).postDelayed(
+                                () -> fetchFullStatsAfterReadingListIncrement(
+                                        uid, baselineBits, baselineTier, rlBefore, attempt + 1),
+                                80);
+                        return;
+                    }
+                    BadgeMilestoneHelper.runAfterStatsCelebrations(
+                            CreateListActivity.this,
+                            getApplicationContext(),
+                            uid,
+                            snap,
+                            done,
+                            baselineBits,
+                            baselineTier);
+                });
     }
 
     private void removeBookFromSelected(String bookId) {

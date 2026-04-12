@@ -2,6 +2,7 @@ package com.example.testbooks1;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -17,6 +18,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.core.widget.NestedScrollView;
 
 import com.bumptech.glide.Glide;
 import com.example.testbooks1.Adapter.ReviewAdapter;
@@ -37,11 +39,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class BookDetailActivity extends AppCompatActivity {
     TextView tvTitle, tvAuthor, tvDescription, tvCategory, tvOverallRating, tvNoReviews;
@@ -65,21 +69,22 @@ public class BookDetailActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_book_detail);
         c = this;
-        View mainContent = findViewById(R.id.main);
-        final int basePaddingLeft = mainContent.getPaddingLeft();
-        final int basePaddingTop = mainContent.getPaddingTop();
-        final int basePaddingRight = mainContent.getPaddingRight();
-        final int basePaddingBottom = mainContent.getPaddingBottom();
-        ViewCompat.setOnApplyWindowInsetsListener(mainContent, (v, insets) -> {
+        View bookScroll = findViewById(R.id.book_detail_scroll);
+        final int bsL = bookScroll.getPaddingLeft();
+        final int bsT = bookScroll.getPaddingTop();
+        final int bsR = bookScroll.getPaddingRight();
+        final int bsB = bookScroll.getPaddingBottom();
+        ViewCompat.setOnApplyWindowInsetsListener(bookScroll, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(
-                    basePaddingLeft + systemBars.left,
-                    basePaddingTop + systemBars.top,
-                    basePaddingRight + systemBars.right,
-                    basePaddingBottom + systemBars.bottom
+                    bsL + systemBars.left,
+                    bsT + systemBars.top,
+                    bsR + systemBars.right,
+                    bsB + systemBars.bottom
             );
             return insets;
         });
+        attachKeyboardScrollPadding(bookScroll, findViewById(R.id.main));
         initialize();
     }
 
@@ -101,6 +106,12 @@ public class BookDetailActivity extends AppCompatActivity {
         communityRef = FirebaseDatabase.getInstance().getReference("communityLists");
         ratingBar = findViewById(R.id.ratingBar);
         etReview = findViewById(R.id.etReview);
+        View bookDetailScroll = findViewById(R.id.book_detail_scroll);
+        etReview.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                ensureFieldVisibleScroll(bookDetailScroll, v);
+            }
+        });
 
         btnPreview = findViewById(R.id.btnPreview);
         btnCreateList = findViewById(R.id.btnCreateList);
@@ -306,6 +317,8 @@ public class BookDetailActivity extends AppCompatActivity {
                             .child(uid)
                             .child("stats")
                             .child("reviews");
+                    int baselineBits = BadgeMilestoneHelper.getStoredBadgeBits(getApplicationContext(), uid);
+                    int baselineTier = BadgeMilestoneHelper.getStoredBadgeTier(getApplicationContext(), uid);
                     reviewStatsRef.setValue(ServerValue.increment(1)).addOnCompleteListener(t2 -> {
                         if (!t2.isSuccessful()) {
                             btnSubmitReview.setEnabled(true);
@@ -325,7 +338,13 @@ public class BookDetailActivity extends AppCompatActivity {
                                     };
                                     if (!isFinishing() && t3.isSuccessful() && t3.getResult() != null) {
                                         BadgeMilestoneHelper.runAfterStatsCelebrations(
-                                                BookDetailActivity.this, getApplicationContext(), uid, t3.getResult(), after);
+                                                BookDetailActivity.this,
+                                                getApplicationContext(),
+                                                uid,
+                                                t3.getResult(),
+                                                after,
+                                                baselineBits,
+                                                baselineTier);
                                     } else {
                                         after.run();
                                     }
@@ -533,15 +552,32 @@ public class BookDetailActivity extends AppCompatActivity {
                 //Toast.makeText(this, "Book added to " + status, Toast.LENGTH_SHORT).show();
                 DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(uid).child("stats");
                 if (status.equals("Read")) {
+                    int baselineBits = BadgeMilestoneHelper.getStoredBadgeBits(getApplicationContext(), uid);
+                    int baselineTier = BadgeMilestoneHelper.getStoredBadgeTier(getApplicationContext(), uid);
                     userRef.child("completed").get().addOnSuccessListener(snapshot -> {
-                        int completed = 0;
-                        if (snapshot.getValue() != null) {
-                            Integer completedValue = snapshot.getValue(Integer.class);
-                            if (completedValue != null) {
-                                completed = completedValue;
+                        long completed = readLeafLong(snapshot);
+                        userRef.child("completed").setValue(completed + 1).addOnCompleteListener(setTask -> {
+                            if (!setTask.isSuccessful()) {
+                                return;
                             }
-                        }
-                        userRef.child("completed").setValue(completed + 1);
+                            FirebaseDatabase.getInstance().getReference("users").child(uid).child("stats").get()
+                                    .addOnCompleteListener(statGet -> {
+                                        if (isFinishing()) {
+                                            return;
+                                        }
+                                        if (!statGet.isSuccessful() || statGet.getResult() == null) {
+                                            return;
+                                        }
+                                        BadgeMilestoneHelper.runAfterStatsCelebrations(
+                                                BookDetailActivity.this,
+                                                getApplicationContext(),
+                                                uid,
+                                                statGet.getResult(),
+                                                () -> { },
+                                                baselineBits,
+                                                baselineTier);
+                                    });
+                        });
                     });
                 } else if (status.equals("Currently Reading")) {
                     userRef.child("reading").get().addOnSuccessListener(snapshot -> {
@@ -559,6 +595,18 @@ public class BookDetailActivity extends AppCompatActivity {
                 Toast.makeText(this, "Failed to add book", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private static long readLeafLong(@Nullable DataSnapshot snapshot) {
+        if (snapshot == null || !snapshot.exists() || snapshot.getValue() == null) {
+            return 0L;
+        }
+        Long l = snapshot.getValue(Long.class);
+        if (l != null) {
+            return l;
+        }
+        Integer i = snapshot.getValue(Integer.class);
+        return i != null ? i.longValue() : 0L;
     }
 
     private void incrementReaction(String reactionType) {
@@ -683,13 +731,56 @@ public class BookDetailActivity extends AppCompatActivity {
                     return;
                 }
                 double avg = total / count;
-                String formatted = String.format("%.1f (%d)", avg, count);
+                String formatted = String.format(Locale.US, "%.1f (%d)", avg, count);
 
                 tvOverallRating.setText(formatted);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 tvOverallRating.setText("0.0");
+            }
+        });
+    }
+
+    private void attachKeyboardScrollPadding(View scroll, View content) {
+        final int pl = content.getPaddingLeft();
+        final int pt = content.getPaddingTop();
+        final int pr = content.getPaddingRight();
+        final int pbBase = content.getPaddingBottom();
+        final View root = scroll.getRootView();
+        final float density = getResources().getDisplayMetrics().density;
+        scroll.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            Rect r = new Rect();
+            scroll.getWindowVisibleDisplayFrame(r);
+            int rootH = root.getHeight();
+            int keypad = Math.max(0, rootH - r.bottom);
+            int slack = (int) (24 * density);
+            int minKeyboard = Math.max((int) (rootH * 0.13f), (int) (180 * density));
+            int extra = keypad > minKeyboard ? keypad + slack : 0;
+            int want = pbBase + extra;
+            if (content.getPaddingBottom() != want) {
+                content.setPadding(pl, pt, pr, want);
+            }
+        });
+    }
+
+    private void ensureFieldVisibleScroll(View scrollView, View field) {
+        final int gapPx = (int) (48 * getResources().getDisplayMetrics().density);
+        field.post(() -> {
+            int[] fLoc = new int[2];
+            int[] sLoc = new int[2];
+            field.getLocationOnScreen(fLoc);
+            scrollView.getLocationOnScreen(sLoc);
+            int fieldBottom = fLoc[1] + field.getHeight();
+            int visibleBottom = sLoc[1] + scrollView.getHeight() - scrollView.getPaddingBottom();
+            int delta = fieldBottom - visibleBottom + gapPx;
+            if (delta <= 0) {
+                return;
+            }
+            if (scrollView instanceof ScrollView) {
+                ((ScrollView) scrollView).smoothScrollBy(0, delta);
+            } else if (scrollView instanceof NestedScrollView) {
+                ((NestedScrollView) scrollView).smoothScrollBy(0, delta);
             }
         });
     }

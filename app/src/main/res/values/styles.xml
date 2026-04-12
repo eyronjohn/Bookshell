@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="Widget.Bookshell.EditText" parent="Widget.AppCompat.EditText">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textColorHint">@color/darkGray</item>
+        <item name="android:textCursorDrawable">@drawable/bookshell_caret</item>
+    </style>
+
     <style name="bookImage">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">6%</item>

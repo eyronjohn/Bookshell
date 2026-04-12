@@ -143,9 +143,16 @@ public class ProfileActivity extends AppCompatActivity {
         listenCurrentlyReading();
         setupClickListeners();
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+        final int topAndSides = WindowInsetsCompat.Type.statusBars() | WindowInsetsCompat.Type.displayCutout();
+        View mainRoot = findViewById(R.id.main);
+        ViewCompat.setOnApplyWindowInsetsListener(mainRoot, (v, insets) -> {
+            Insets b = insets.getInsets(topAndSides);
+            v.setPadding(b.left, b.top, b.right, 0);
+            return insets;
+        });
+        ViewCompat.setOnApplyWindowInsetsListener(bottomNav, (v, insets) -> {
+            Insets nav = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+            v.setPadding(0, 0, 0, nav.bottom);
             return insets;
         });
     }
@@ -477,6 +484,8 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void applyDailyCheckIn() {
         DatabaseReference statsRef = mDatabase.child("users").child(userId).child("stats");
+        int baselineBits = BadgeMilestoneHelper.getStoredBadgeBits(getApplicationContext(), userId);
+        int baselineTier = BadgeMilestoneHelper.getStoredBadgeTier(getApplicationContext(), userId);
         statsRef.runTransaction(new Transaction.Handler() {
             @NonNull
             @Override
@@ -533,7 +542,9 @@ public class ProfileActivity extends AppCompatActivity {
                                             return;
                                         }
                                         Toast.makeText(context, R.string.toast_checked_in_today, Toast.LENGTH_SHORT).show();
-                                    });
+                                    },
+                                    baselineBits,
+                                    baselineTier);
                         });
             }
         });

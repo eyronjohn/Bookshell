@@ -56,6 +56,8 @@
             android:background="@drawable/rounded_search"
             android:padding="10dp"
             android:inputType="text"
+            android:maxLines="1"
+            android:imeOptions="actionSearch"
             android:drawableStart="@drawable/ic_search"
             android:fontFamily="@font/jakarta_light"
             android:drawablePadding="8dp"
@@ -219,9 +221,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:menu="@menu/bottom_nav"
-        app:itemIconTint="@color/black"
-        app:itemTextColor="@color/black"
-        android:backgroundTint="@color/white"
+        android:background="@color/white"
+        app:itemIconTint="@color/bottom_nav_item_tint"
+        app:itemTextColor="@color/bottom_nav_item_tint"
         app:labelVisibilityMode="labeled"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

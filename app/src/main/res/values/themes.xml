@@ -1,8 +1,8 @@
-<resources>
-    <!-- Base application theme. -->
-    <style name="Base.Theme.TestBooks1" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.TestBooks1" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:windowBackground">@color/lightWhite</item>
+        <item name="android:editTextStyle">@style/Widget.Bookshell.EditText</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
 
     <style name="Theme.TestBooks1" parent="Base.Theme.TestBooks1" />

@@ -91,8 +91,7 @@ public class CloudinaryApp extends Application {
         statsListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Activity a = currentActivity;
-                BadgeMilestoneHelper.processStatsSnapshot(a, CloudinaryApp.this, uid, snapshot);
+                BadgeMilestoneHelper.processStatsSnapshot(null, CloudinaryApp.this, uid, snapshot);
             }
 
             @Override

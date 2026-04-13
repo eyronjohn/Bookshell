@@ -18,6 +18,7 @@
                 android:id="@+id/ivProfileImage"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
+                android:scaleType="centerCrop"
                 android:src="@drawable/default_pfp"
                 android:layout_marginEnd="8dp"
                 app:shapeAppearanceOverlay="@style/profileImage" />

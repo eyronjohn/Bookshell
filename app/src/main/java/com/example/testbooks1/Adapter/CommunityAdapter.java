@@ -239,12 +239,14 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
             holder.tvFullName.setText(cached.fullName);
             if (cached.imageUrl != null && !cached.imageUrl.isEmpty()) {
                 Glide.with(context).load(cached.imageUrl)
+                        .centerCrop()
                         .placeholder(R.drawable.default_pfp)
                         .error(R.drawable.default_pfp)
                         .into(holder.ivProfileImage);
             }
         } else if (item.profileImageUrl != null && !item.profileImageUrl.isEmpty()) {
             Glide.with(context).load(item.profileImageUrl)
+                    .centerCrop()
                     .placeholder(R.drawable.default_pfp)
                     .error(R.drawable.default_pfp)
                     .into(holder.ivProfileImage);
